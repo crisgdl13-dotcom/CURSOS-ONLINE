@@ -1,12 +1,17 @@
 <?php
-// Inicia la sesión para verificar si el usuario es administrador
+
+
+
 session_start();
 
-// Verifica que el usuario haya iniciado sesión y que sea administrador
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] !== 'admin') {
+if (!isset($_SESSION['rol_id']) || $_SESSION['rol_id'] != 1) {
     echo "<script>alert('Acceso denegado. Solo administradores.'); window.location.href='login.html';</script>";
     exit();
 }
+
+
+
+
 
 require 'conexion.php'; // Incluye la conexión
 
@@ -48,4 +53,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: admin_cursos.html");
     exit();
 }
+
 ?>
