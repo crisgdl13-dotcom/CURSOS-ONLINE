@@ -33,9 +33,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($resultado->num_rows > 0) {
         $fila = $resultado->fetch_assoc();
-        $password_hash = $fila['password_hash'];
-        $rol = $fila['rol'];
 
+
+// Busca estas líneas y asegúrate que coincidan con tu tabla
+$password_hash = $fila['contraseña']; // En lugar de password_hash
+$rol = $fila['idRol']; // En lugar de rol
+
+
+        
         // 4. Verificar la contraseña
         if (password_verify($password_ingresada, $password_hash)) {
             // Contraseña correcta: iniciar sesión (usando una sesión simple)
@@ -69,3 +74,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+
