@@ -4,6 +4,12 @@ require 'conexion.php';
 
 
 
+
+
+
+
+
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
@@ -28,18 +34,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password_ingresada = $_POST['password'];
 
     // 3. Consultar usuario por email
-    $sql = "SELECT password_hash, rol FROM usuarios WHERE email = '$email'";
+    $sql = "SELECT password_hash, rol FROM usuarios WHERE correo = '$email'";
     $resultado = $conn->query($sql);
 
     if ($resultado->num_rows > 0) {
         $fila = $resultado->fetch_assoc();
 
 
-// Busca estas líneas y asegúrate que coincidan con tu tabla
-$password_hash = $fila['contraseña']; // En lugar de password_hash
-$rol = $fila['idRol']; // En lugar de rol
 
 
+$password_hash = $fila['contraseña'];
+$rol = $fila['idRol'];
+
+
+
+
+        
         
         // 4. Verificar la contraseña
         if (password_verify($password_ingresada, $password_hash)) {
@@ -74,4 +84,5 @@ $rol = $fila['idRol']; // En lugar de rol
 }
 
 ?>
+
 
