@@ -9,8 +9,10 @@ var_dump($_SESSION);
 echo "</pre>";
 exit();
 
-
+//esto se modifico lo que me dijiste
 if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] != 1) {
+//sooo esto
+    
     echo "<script>alert('Acceso denegado. Solo administradores.'); window.location.href='login.html';</script>";
     exit();
 }
@@ -61,5 +63,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+
 
 
