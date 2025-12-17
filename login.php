@@ -1,95 +1,73 @@
+
+
+
 <?php
-// Incluye la conexión a la base de datos
-require 'conexion.php'; 
-
-
-
-
-
-
-
-
+require 'conexion.php';
 
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-
-// Función para sanitizar datos (protección básica)
 function sanitizar($conexion, $dato) {
     return mysqli_real_escape_string($conexion, trim($dato));
 }
 
-// Verifica que el formulario haya sido enviado
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    
-    // 1. Conexión a la base de datos
-    $conn = new mysqli($host, $usuario, $password, $basededatos);
 
+    $conn = new mysqli($host, $usuario, $password, $basededatos);
     if ($conn->connect_error) {
         die("Conexión fallida: " . $conn->connect_error);
     }
-    
-    // 2. Obtener y sanitizar datos
+
     $email = sanitizar($conn, $_POST['email']);
     $password_ingresada = $_POST['password'];
 
-    // 3. Consultar usuario por email
-    $sql = "SELECT password_hash, rol FROM usuarios WHERE correo = '$email'";
+    // 🔑 CONSULTA CORRECTA CON ROL
+    $sql = "
+        SELECT u.contraseña, u.idRol, r.nombreRol
+        FROM usuarios u
+        JOIN roles r ON u.idRol = r.idRol
+        WHERE u.correo = '$email'
+        LIMIT 1
+    ";
+
     $resultado = $conn->query($sql);
 
-    if ($resultado->num_rows > 0) {
+    if ($resultado && $resultado->num_rows === 1) {
+
         $fila = $resultado->fetch_assoc();
+        $password_hash = $fila['contraseña'];
+        $rol_id = $fila['idRol'];
+        $rol_nombre = $fila['nombreRol'];
 
-
-
-
-$password_hash = $fila['contraseña'];
-$rol = $fila['idRol'];
-
-
-
-
-        
-        
-        // 4. Verificar la contraseña
         if (password_verify($password_ingresada, $password_hash)) {
-            // Contraseña correcta: iniciar sesión (usando una sesión simple)
+
             session_start();
             $_SESSION['usuario_email'] = $email;
-            $_SESSION['usuario_rol'] = $rol;
+            $_SESSION['rol_id'] = $rol_id;
+            $_SESSION['rol_nombre'] = $rol_nombre;
 
-
-
-
-
-
-            
-            // 5. Redireccionar según el rol
-            if ($rol === 1) {
-                header("Location: admin_cursos.html"); // Redirige al panel de administración
+            // 🔀 REDIRECCIÓN POR ROL
+            if ($rol_id == 1) {
+                header("Location: admin_cursos.html");
             } else {
-                header("Location: perfil.html"); // Redirige al perfil de usuario normal
+                header("Location: perfil.html");
             }
             exit();
 
         } else {
-            // Contraseña incorrecta
-            echo "<script>alert('Correo o Contraseña incorrecta.'); window.location.href='login.html';</script>";
+            echo "<script>alert('Correo o contraseña incorrecta'); window.location.href='login.html';</script>";
         }
 
     } else {
-        // Usuario no encontrado
-        echo "<script>alert('Correo o Contraseña incorrecta.'); window.location.href='login.html';</script>";
+        echo "<script>alert('Correo o contraseña incorrecta'); window.location.href='login.html';</script>";
     }
 
     $conn->close();
+
 } else {
-    // Si se accede directamente sin POST, redirigir al login
     header("Location: login.html");
     exit();
 }
-
 ?>
-
 
 
