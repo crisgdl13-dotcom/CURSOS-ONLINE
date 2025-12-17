@@ -58,8 +58,14 @@ $rol = $fila['idRol'];
             $_SESSION['usuario_email'] = $email;
             $_SESSION['usuario_rol'] = $rol;
 
+
+
+
+
+
+            
             // 5. Redireccionar según el rol
-            if ($rol === 'admin') {
+            if ($rol === 1) {
                 header("Location: admin_cursos.html"); // Redirige al panel de administración
             } else {
                 header("Location: perfil.html"); // Redirige al perfil de usuario normal
@@ -84,5 +90,6 @@ $rol = $fila['idRol'];
 }
 
 ?>
+
 
 
