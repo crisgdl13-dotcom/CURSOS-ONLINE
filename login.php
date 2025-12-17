@@ -2,6 +2,12 @@
 // Incluye la conexión a la base de datos
 require 'conexion.php'; 
 
+
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
 // Función para sanitizar datos (protección básica)
 function sanitizar($conexion, $dato) {
     return mysqli_real_escape_string($conexion, trim($dato));
@@ -61,4 +67,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     header("Location: login.html");
     exit();
 }
+
 ?>
