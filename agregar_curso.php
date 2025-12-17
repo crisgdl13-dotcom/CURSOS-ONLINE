@@ -4,6 +4,12 @@
 
 session_start();
 
+echo "<pre>";
+var_dump($_SESSION);
+echo "</pre>";
+exit();
+
+
 if (!isset($_SESSION['rol_id']) || $_SESSION['rol_id'] != 1) {
     echo "<script>alert('Acceso denegado. Solo administradores.'); window.location.href='login.html';</script>";
     exit();
@@ -55,3 +61,4 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+
