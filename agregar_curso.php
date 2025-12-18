@@ -28,18 +28,18 @@ if ($conn->connect_error) {
 }
 
 // 5. Recibir datos
-$titulo = $conn->real_escape_string($_POST['titulo']);
-$instructor = $conn->real_escape_string($_POST['instructor']);
-$imagen_url = $conn->real_escape_string($_POST['imagen_url']);
-$precio_actual = floatval($_POST['precio_actual']);
-$precio_anterior = floatval($_POST['precio_anterior']);
-$etiqueta = $conn->real_escape_string($_POST['etiqueta']);
 
-// 6. Insertar
-$sql = "INSERT INTO cursos 
-(titulo, instructor, imagen_url, precio_actual, precio_anterior, etiqueta, valoracion, reviews)
-VALUES 
-('$titulo','$instructor','$imagen_url',$precio_actual,$precio_anterior,'$etiqueta',0,0)";
+
+$titulo = $conn->real_escape_string($_POST['titulo']);
+$precio_actual = floatval($_POST['precio_actual']);
+
+
+
+
+$sql = "INSERT INTO cursos (nombreCurso, descripcion, precio, idInstructor)
+        VALUES ('$titulo', 'Curso agregado desde panel admin', '$precio_actual', 1)";
+
+
 
 if ($conn->query($sql)) {
     echo "<script>alert('Curso agregado correctamente'); window.location='admin_cursos.html';</script>";
@@ -49,6 +49,7 @@ if ($conn->query($sql)) {
 
 $conn->close();
 ?>
+
 
 
 
