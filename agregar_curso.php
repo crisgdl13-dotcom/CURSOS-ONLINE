@@ -1,13 +1,16 @@
+
 <?php
-
-
-
 session_start();
 
-echo "<pre>";
-var_dump($_SESSION);
-echo "</pre>";
-exit();
+if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] != 1) {
+    echo "<script>alert('Acceso denegado. Solo administradores.'); window.location.href='login.html';</script>";
+    exit();
+}
+
+require 'conexion.php';
+
+
+
 
 //esto se modifico lo que me dijiste
 if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] != 1) {
@@ -16,6 +19,8 @@ if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] != 1) {
     echo "<script>alert('Acceso denegado. Solo administradores.'); window.location.href='login.html';</script>";
     exit();
 }
+
+
 
 
 
@@ -63,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 }
 
 ?>
+
 
 
 
