@@ -30,14 +30,19 @@ if ($conn->connect_error) {
 // 5. Recibir datos
 
 
+
 $titulo = $conn->real_escape_string($_POST['titulo']);
-$precio_actual = floatval($_POST['precio_actual']);
-
-
-
+$precio = floatval($_POST['precio_actual']);
 
 $sql = "INSERT INTO cursos (nombreCurso, descripcion, precio, idInstructor)
-        VALUES ('$titulo', 'Curso agregado desde panel admin', '$precio_actual', 1)";
+        VALUES ('$titulo', 'Curso agregado desde panel admin', $precio, 1)";
+
+
+
+
+
+
+
 
 
 
@@ -49,6 +54,9 @@ if ($conn->query($sql)) {
 
 $conn->close();
 ?>
+
+
+
 
 
 
