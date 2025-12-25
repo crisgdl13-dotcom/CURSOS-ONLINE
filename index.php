@@ -1,0 +1,52 @@
+
+<?php
+session_start();
+?>
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Cursos Online - Landing</title>
+  <link rel="stylesheet" href="styles.css">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body class="landing-page">
+
+<header>
+  <h1>Bienvenido a Cursos Online</h1>
+
+  <nav>
+    <?php if (!isset($_SESSION['usuario'])) { ?>
+      <a href="login.php" class="btn">Ingresar</a>
+      <a href="registro.html" class="btn">Registrarse</a>
+    <?php } else { ?>
+      <a href="perfil.php" class="btn primary">Mi perfil</a>
+      <a href="logout.php" class="btn">Salir</a>
+    <?php } ?>
+  </nav>
+</header>
+
+<main>
+  <section>
+    <h2>Aprende a tu ritmo</h2>
+    <p>Accede a nuestros cursos de tecnología, negocios y más.</p>
+
+    <?php if (!isset($_SESSION['usuario'])) { ?>
+      <a href="login.php" class="btn primary">Comenzar ahora</a>
+    <?php } else { ?>
+      <a href="productos.php" class="btn primary">Ver cursos</a>
+    <?php } ?>
+  </section>
+</main>
+
+<footer>
+  <p>© 2025 Cursos Online "DON CHUY"</p>
+</footer>
+
+</body>
+</html>
