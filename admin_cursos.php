@@ -1,4 +1,15 @@
 <!DOCTYPE html>
+
+<?php
+session_start();
+
+if (!isset($_SESSION['usuario']) || $_SESSION['rol'] != 'admin') {
+    header("Location: login.php");
+    exit();
+}
+?>
+
+  
 <html lang="es">
 <head>
   <meta charset="UTF-8">
@@ -42,6 +53,7 @@
 </body>
 
 </html>
+
 
 
 
