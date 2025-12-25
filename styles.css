@@ -286,3 +286,21 @@ a.btn:hover {
 .stars-input input:checked ~ label {
   color: #e59819;
 }
+
+
+
+
+
+/* ==================================== */
+/* Formularios (Admin / CRUD)            */
+/* ==================================== */
+.form-control {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
