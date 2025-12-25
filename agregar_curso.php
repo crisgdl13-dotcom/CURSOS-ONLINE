@@ -6,58 +6,58 @@ ini_set('display_errors', 1);
 
 session_start();
 
-// 1. Seguridad: solo admin
-if (!isset($_SESSION['usuario_rol']) || $_SESSION['usuario_rol'] != 1) {
-    echo "<script>alert('Acceso denegado. Solo administradores'); window.location='login.html';</script>";
-    exit;
+/* =========================
+   Seguridad: solo ADMIN
+========================= */
+if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+    header("Location: login.php");
+    exit();
 }
 
-// 2. Conexión
+/* =========================
+   Validar método POST
+========================= */
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: admin_cursos.php");
+    exit();
+}
+
+/* =========================
+   Conexión BD
+========================= */
 require 'conexion.php';
 
-// 3. Verificar POST
-if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    header("Location: admin_cursos.html");
-    exit;
+/* =========================
+   Recibir datos del formulario
+========================= */
+$nombreCurso  = trim($_POST['nombreCurso']);
+$descripcion  = trim($_POST['descripcion']);
+$precio       = floatval($_POST['precio']);
+$idInstructor = intval($_POST['idInstructor']);
+
+/* =========================
+   Validación backend mínima
+========================= */
+if (strlen($nombreCurso) < 5 || $precio <= 0) {
+    die("Datos inválidos");
 }
 
-// 4. Conectar a BD
-$conn = new mysqli($host, $usuario, $password, $basededatos);
-if ($conn->connect_error) {
-    die("Error BD: " . $conn->connect_error);
-}
+/* =========================
+   Insert seguro (Prepared)
+========================= */
+$stmt = $conexion->prepare(
+    "INSERT INTO cursos (nombreCurso, descripcion, precio, idInstructor)
+     VALUES (?, ?, ?, ?)"
+);
 
-// 5. Recibir datos
+$stmt->bind_param("ssdi", $nombreCurso, $descripcion, $precio, $idInstructor);
 
-
-
-$titulo = $conn->real_escape_string($_POST['titulo']);
-$precio = floatval($_POST['precio_actual']);
-
-
-
-$sql = "INSERT INTO cursos (nombreCurso, descripcion, precio, idInstructor)
-        VALUES ('$titulo', 'Curso agregado desde panel admin', $precio_actual, 1)";
-
-
-
-
-
-
-
-if ($conn->query($sql)) {
-    echo "<script>alert('Curso agregado correctamente'); window.location='admin_cursos.html';</script>";
+if ($stmt->execute()) {
+    header("Location: admin_cursos.php?ok=1");
 } else {
-    die("Error SQL: " . $conn->error);
+    die("Error SQL: " . $stmt->error);
 }
 
-$conn->close();
+$stmt->close();
+$conexion->close();
 ?>
-
-
-
-
-
-
-
-
