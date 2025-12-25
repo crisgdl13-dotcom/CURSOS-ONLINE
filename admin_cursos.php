@@ -1,59 +1,103 @@
-<!DOCTYPE html>
 
-<?php
+      <?php
 session_start();
 
 if (!isset($_SESSION['usuario']) || $_SESSION['rol'] != 'admin') {
     header("Location: login.php");
     exit();
 }
+
+require 'conexion.php';
 ?>
 
-  
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Administrar Cursos - Cursos Online</title>
+  <title>Administrar Cursos</title>
   <link rel="stylesheet" href="styles.css">
-  <body class="no-background-page">
+  <script src="validar_curso.js"></script>
 </head>
-<body>
-  <div class="container">
-    <h2>Agregar Nuevo Curso</h2>
-    
 
-<form action="/CURSOS-ONLINE/agregar_curso.php" method="POST"
-      style="max-width:600px;margin:20px auto;padding:20px;background:#fff;border-radius:8px;box-shadow:0 2px 4px rgba(0,0,0,0.1);">
+<body class="no-background-page">
+<div class="container">
 
-  
-      
-      <label for="titulo" style="display: block; margin-top: 10px; font-weight: bold;">Título del Curso:</label>
-      <input type="text" id="titulo" name="titulo" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+<h2>Agregar Nuevo Curso</h2>
 
-      <label for="instructor" style="display: block; margin-top: 10px; font-weight: bold;">Instructor:</label>
-      <input type="text" id="instructor" name="instructor" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-      
-      <label for="imagen_url" style="display: block; margin-top: 10px; font-weight: bold;">URL de la Imagen:</label>
-      <input type="url" id="imagen_url" name="imagen_url" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+<form action="agregar_curso.php" method="POST" onsubmit="return validarCurso()">
 
-      <label for="precio_actual" style="display: block; margin-top: 10px; font-weight: bold;">Precio Actual (USD):</label>
-      <input type="number" step="0.01" id="precio_actual" name="precio_actual" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+  <label>Título del Curso:</label>
+  <input type="text" id="titulo" name="nombreCurso" class="form-control" required>
 
-      <label for="precio_anterior" style="display: block; margin-top: 10px; font-weight: bold;">Precio Anterior (USD):</label>
-      <input type="number" step="0.01" id="precio_anterior" name="precio_anterior" required style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
+  <label>Descripción:</label>
+  <textarea name="descripcion" class="form-control" required></textarea>
 
-      <label for="etiqueta" style="display: block; margin-top: 10px; font-weight: bold;">Etiqueta (Ej: Premium, Nuevo):</label>
-      <input type="text" id="etiqueta" name="etiqueta" style="width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box;">
-      
-      <button type="submit" class="btn primary" style="width: 100%; margin-top: 20px;">Agregar Curso</button>
-    </form>
-    
-    <p style="text-align: center; margin-top: 20px;"><a href="productos.html">Ver Cursos</a></p>
-  </div>
+  <label>Instructor:</label>
+  <select name="idInstructor" class="form-control" required>
+    <option value="">Seleccione instructor</option>
+    <?php
+    $inst = mysqli_query($conexion, "SELECT idUsuario, nombre FROM usuarios WHERE idRol = 2");
+    while ($i = mysqli_fetch_assoc($inst)) {
+        echo "<option value='{$i['idUsuario']}'>{$i['nombre']}</option>";
+    }
+    ?>
+  </select>
+
+  <label>Precio:</label>
+  <input type="number" step="0.01" id="precio_actual" name="precio" class="form-control" required>
+
+  <button type="submit" class="btn primary">Agregar Curso</button>
+</form>
+
+<?php
+$cursos = mysqli_query($conexion, "SELECT * FROM cursos");
+?>
+
+<h2 style="margin-top:40px;">Cursos Registrados</h2>
+
+<table border="1" width="100%" cellpadding="8">
+  <tr>
+    <th>ID</th>
+    <th>Nombre</th>
+    <th>Precio</th>
+    <th>Acciones</th>
+  </tr>
+
+  <?php while ($curso = mysqli_fetch_assoc($cursos)) { ?>
+    <tr>
+      <td><?= $curso['idCurso'] ?></td>
+      <td><?= $curso['nombreCurso'] ?></td>
+      <td>$<?= $curso['precio'] ?></td>
+      <td>
+        <a href="eliminar_curso.php?id=<?= $curso['idCurso'] ?>"
+           onclick="return confirm('¿Eliminar curso?');">
+           Eliminar
+        </a>
+      </td>
+    </tr>
+  <?php } ?>
+</table>
+
+<p style="margin-top:20px;">
+  <a href="productos.php">Ver cursos</a>
+</p>
+
+</div>
 </body>
-
 </html>
 
 
+
+
+
+
+
+
+
+
+
+
+
+      
 
 
