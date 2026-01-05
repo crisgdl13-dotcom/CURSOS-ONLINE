@@ -1,16 +1,30 @@
-
-
-
 <?php
-$host = "localhost";
-$usuario = "root";
-$password = "";
-$basededatos = "cursos_online";
-$conexion = new mysqli($host, $usuario, $password, $basededatos);
+$host = 'localhost';
+$db   = 'cursos_don_chuy';
+$user = 'donchuy';
+$pass = 'password123';
+$charset = 'utf8mb4';
 
-if ($conexion->connect_error) {
-    die("Error de conexión: " . $conexion->connect_error);
+$dsn = "mysql:host=$host;dbname=$db;charset=$charset";
+$options = [
+    PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
+    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    PDO::ATTR_EMULATE_PREPARES   => false,
+];
+
+try {
+    $pdo = new PDO($dsn, $user, $pass, $options);
+
+    if (basename($_SERVER['PHP_SELF']) == 'conexion.php') {
+        echo "<div style='color: green; font-size: 20px; text-align: center; margin-top: 50px;'>";
+        echo "✅ ¡Conexión exitosa a la base de datos 'cursos_don_chuy'!";
+        echo "</div>";
+    }
+} catch (\PDOException $e) {
+    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+}
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
 }
 ?>
-
-
