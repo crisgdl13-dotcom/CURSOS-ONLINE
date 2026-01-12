@@ -1,7 +1,8 @@
+
 <?php
 include 'conexion.php';
 
-// 1. Seguridad básica
+// 1. Seguridad básica: Si no está logueado o no trae ID, lo sacamos
 if (!isset($_SESSION['usuario_id'])) { header("Location: login.php"); exit; }
 if (!isset($_GET['id'])) { header("Location: perfil.php"); exit; }
 
@@ -9,43 +10,42 @@ $curso_id = $_GET['id'];
 $usuario_id = $_SESSION['usuario_id'];
 $mensaje = "";
 
-// 2. SEGURIDAD: ¿Compró el curso?
+// 2. SEGURIDAD: ¿El usuario realmente compró este curso?
 $sql = "SELECT * FROM compras WHERE usuario_id = ? AND curso_id = ?";
 $stmt = $pdo->prepare($sql);
 $stmt->execute([$usuario_id, $curso_id]);
 $compra = $stmt->fetch();
 
 if (!$compra) {
-    echo "⛔ Acceso Denegado."; exit;
+    echo "⛔ Acceso Denegado. No has comprado este curso."; exit;
 }
 
-// --- 3. LÓGICA DE VOTACIÓN (NUEVO) ---
+// --- 3. LÓGICA DE VOTACIÓN ---
 if (isset($_GET['votar'])) {
     $voto = (int)$_GET['votar'];
 
     if ($voto >= 1 && $voto <= 5) {
-        // A) Guardamos tu voto individual
+        // A) Guardamos tu voto individual en la compra
         $sql_update = "UPDATE compras SET calificacion = ? WHERE usuario_id = ? AND curso_id = ?";
         $pdo->prepare($sql_update)->execute([$voto, $usuario_id, $curso_id]);
 
-        // B) Calculamos el NUEVO promedio de este curso
-        // (Promediamos todos los votos de la tabla compras para este curso)
+        // B) Calculamos el NUEVO promedio general del curso
         $sql_promedio = "SELECT AVG(calificacion) as promedio FROM compras WHERE curso_id = ? AND calificacion IS NOT NULL";
         $stmt_prom = $pdo->prepare($sql_promedio);
         $stmt_prom->execute([$curso_id]);
         $nuevo_promedio = $stmt_prom->fetch()['promedio'];
 
-        // C) Actualizamos el curso para que se vea en el Index
+        // C) Actualizamos la calificación del curso en la tabla principal
         $sql_curso_update = "UPDATE cursos SET calificacion = ? WHERE id = ?";
         $pdo->prepare($sql_curso_update)->execute([$nuevo_promedio, $curso_id]);
 
         $mensaje = "¡Gracias por tu calificación!";
-        // Refrescamos la variable $compra para que se ilumine la estrella ya
+        // Refrescamos la variable local para que se vea la estrella pintada ahorita mismo
         $compra['calificacion'] = $voto;
     }
 }
 
-// 4. Traer info del curso
+// 4. Traer la información del curso (Nombre, video, instructor, etc.)
 $stmt_curso = $pdo->prepare("SELECT * FROM cursos WHERE id = ?");
 $stmt_curso->execute([$curso_id]);
 $curso = $stmt_curso->fetch();
@@ -83,10 +83,14 @@ $curso = $stmt_curso->fetch();
 
         <div class="row">
             <div class="col-md-8">
-                <div class="ratio ratio-16x9 shadow-lg mb-4" style="border: 2px solid #444;">
-                    <iframe src="https://www.youtube.com/embed/5qap5aO4i9A" allowfullscreen></iframe>
-                </div>
 
+                <div class="ratio ratio-16x9 shadow-lg mb-4" style="border: 2px solid #444;">
+                    <?php
+                        // Si hay un link guardado en la BD, úsalo. Si no, usa el de música Lofi por defecto.
+                        $video = !empty($curso['video_url']) ? $curso['video_url'] : 'https://www.youtube.com/embed/5qap5aO4i9A';
+                    ?>
+                    <iframe src="<?php echo $video; ?>" allowfullscreen></iframe>
+                </div>
                 <div class="d-flex justify-content-between align-items-center">
                     <h3>Lección 1: Introducción</h3>
 
@@ -94,9 +98,7 @@ $curso = $stmt_curso->fetch();
                         <p class="mb-0 small">Califica este curso:</p>
                         <div>
                             <?php
-                            // Dibujamos las 5 estrellas
                             for($i=1; $i<=5; $i++){
-                                // Si la estrella es menor o igual a tu voto, la pintamos amarilla
                                 $clase = ($i <= $compra['calificacion']) ? 'estrella-activa' : '';
                                 echo "<a href='ver_curso.php?id=$curso_id&votar=$i' class='estrella-btn $clase'>★</a>";
                             }
@@ -105,7 +107,7 @@ $curso = $stmt_curso->fetch();
                     </div>
                 </div>
 
-                <p class="mt-3"><?php echo $curso['descripcion']; ?></p>
+                <p class="mt-3"><?php echo htmlspecialchars($curso['descripcion']); ?></p>
             </div>
 
             <div class="col-md-4">
@@ -114,6 +116,7 @@ $curso = $stmt_curso->fetch();
                     <ul class="list-group list-group-flush text-dark">
                         <li class="list-group-item active">1. Introducción <i class="fas fa-play-circle float-end"></i></li>
                         <li class="list-group-item">2. Conceptos básicos <i class="fas fa-lock float-end text-muted"></i></li>
+                        <li class="list-group-item">3. Práctica final <i class="fas fa-lock float-end text-muted"></i></li>
                     </ul>
                 </div>
 
@@ -124,5 +127,7 @@ $curso = $stmt_curso->fetch();
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
